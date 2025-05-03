@@ -62,79 +62,64 @@ To design and simulate a 4:1 Multiplexer (MUX) using Verilog HDL in four differe
 
 ### 4:1 MUX Gate-Level Implementation
 ```verilog
-module mux4_to_1_gate (
-    input wire A,
-    input wire B,
-    input wire C,
-    input wire D,
-    input wire S0,
-    input wire S1,
-    output wire Y
-);
-    wire not_S0, not_S1;
-    wire A_and, B_and, C_and, D_and;
-
-    not (not_S0, S0);
-    not (not_S1, S1);
-
-    and (A_and, A, not_S1, not_S0);
-    and (B_and, B, not_S1, S0);
-    and (C_and, C, S1, not_S0);
-    and (D_and, D, S1, S0);
-
-    or (Y, A_and, B_and, C_and, D_and);
+module mux_24gl (s0,s1,a,b,c,d,Y);
+input s0,s1,a,b,c,d;
+output Y;
+wire w1,w2,w3,w4,w5,w6;
+not g1(w1,s1);
+not g2(w2,s0);
+and g3(w3,w1,w2,a);
+and g4(w4,w1,s0,b);
+and g3(w5,s1,w2,c);
+and g3(w6,s1,s0,d);
+or g7(Y,w3,w4,w5,w6);
 endmodule
 ```
 ## Simulated Output Gate Level Modelling
 
-_______ Here Paste the Simulated output  ___________
+
+![image](https://github.com/user-attachments/assets/82520dac-a50f-4270-a188-9ae11d350a2c)
+
 
 ### 4:1 MUX Data Flow Implementation
 ```verilog
-module mux4_to_1_dataflow (
-    input wire A,
-    input wire B,
-    input wire C,
-    input wire D,
-    input wire S0,
-    input wire S1,
-    output wire Y
-);
-    assign Y = (~S1 & ~S0 & A) |
-               (~S1 & S0 & B) |
-               (S1 & ~S0 & C) |
-               (S1 & S0 & D);
+module mux_24dl(s,a,b,c,d,y);
+input [1:0]s;
+input a,b,c,d;
+output y;
+wire [3:0]w;
+assign w[0]=~s[1]&~s[0]&a;
+assign w[1]=~s[1]&s[0]&b;
+assign w[2]=s[1]&~s[0]&c;
+assign w[3]=s[1]&s[0]&d;
+assign y=w[0]|w[1]|w[2]|w[3];
 endmodule
 ```
-## Simulated Output Data Flow Modelling
+![image](https://github.com/user-attachments/assets/10425a02-bb6b-45fa-8227-c683db0f005c)
 
-_______ Here Paste the Simulated output  ___________
 
 ### 4:1 MUX Behavioral Implementation
 ```verilog
-module mux4_to_1_behavioral (
-    input wire A,
-    input wire B,
-    input wire C,
-    input wire D,
-    input wire S0,
-    input wire S1,
-    output reg Y
-);
-    always @(*) begin
-        case ({S1, S0})
-            2'b00: Y = A;
-            2'b01: Y = B;
-            2'b10: Y = C;
-            2'b11: Y = D;
-            default: Y = 1'bx;
-        endcase
-    end
+module mux24_beh(i,s,y);
+input [4:1]i;
+input [1:0]s;
+output reg y;
+always@(*)
+begin
+if(s[1]==0&s[0]==0)
+y=i[1];
+else if(s[1]==0&s[0]==1)
+y=i[2];
+else if(s[1]==1&s[0]==0)
+y=i[3];
+else if(s[1]==1&s[0]==1)
+y=i[4];
+end
 endmodule
 ```
 ## Simulated Output Behavioral Modelling
+![image](https://github.com/user-attachments/assets/36fd7272-43b2-47f9-b846-9be940c4f966)
 
-_______ Here Paste the Simulated output  ___________
 
 
 ### 4:1 MUX Structural Implementation
@@ -170,8 +155,8 @@ module mux4_to_1_structural (
 endmodule
 ```
 ## Simulated Output Structural Modelling
+![image](https://github.com/user-attachments/assets/885a1b58-cb83-4029-903e-5491f2798cf4)
 
-_______ Here Paste the Simulated output  ___________
 
 ### Testbench Implementation
 ```verilog
